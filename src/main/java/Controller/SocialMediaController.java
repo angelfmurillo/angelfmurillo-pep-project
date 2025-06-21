@@ -40,18 +40,17 @@ public class SocialMediaController {
         Account addedAccount = new Account();
 
         if (username.isBlank() || password.length() < 4 ){
-            ctx.status(400).json(Map.of("error: ","empty username or password has less than 4 characters"));
+            ctx.status(400);
             return;
         }
 
         if (acctService.usernameExists(username)){
-            ctx.status(400).json(Map.of("error: ","username : " + username + " is not available"));
-            return;
+            ctx.status(400);
         }
 
         addedAccount = acctService.registerUser(username, password);
         if (addedAccount != null) ctx.status(200).json(addedAccount);
-        else ctx.status(400).json(Map.of("error: "," account couldn't be added "));
+        else ctx.status(400);
 
         
 
