@@ -2,7 +2,6 @@ package Controller;
 
 import io.javalin.Javalin;
 import io.javalin.http.Context;
-import java.util.Map;
 import Model.Account;
 import Service.AccountService;
 
@@ -31,6 +30,38 @@ public class SocialMediaController {
         return app;
     }
 
+    private void loginHandler(Context ctx){
+
+        //extract the username and password from the request
+        Account userAcct = ctx.bodyAsClass(Account.class);
+        String username = userAcct.getUsername();
+        String password = userAcct.getPassword();
+        AccountService acctService = new AccountService();
+        Account acctLoggedIn = new Account();
+
+        acctLoggedIn = acctService.loginUser(username, password);
+        if (acctLoggedIn != null) ctx.status(200).json(acctLoggedIn);
+        else ctx.status(401);
+
+        
+        /*
+        As a user, I should be able to verify my login on the endpoint POST localhost:8080/login. 
+        The request body will contain a JSON representation of an Account, not containing an account_id. 
+        In the future, this action may generate a Session token to allow the user to securely use the site. 
+        We will not worry about this for now.
+
+        - The login will be successful if and only if the username and password provided in the request body 
+          JSON match a real account existing on the database. If successful, the response body should contain 
+          a JSON of the account in the response body, including its account_id. The response status should be 
+          200 OK, which is the default.
+        - If the login is not successful, the response status should be 401. (Unauthorized)
+       */
+
+
+
+
+
+    }
     private void registerAccountHandler(Context ctx){
 
         Account userAcct = ctx.bodyAsClass(Account.class);
@@ -39,13 +70,9 @@ public class SocialMediaController {
         AccountService acctService = new AccountService();
         Account addedAccount = new Account();
 
-        if (username.isBlank() || password.length() < 4 ){
+        if (username.isBlank() || (password.length() < 4) ){
             ctx.status(400);
             return;
-        }
-
-        if (acctService.usernameExists(username)){
-            ctx.status(400);
         }
 
         addedAccount = acctService.registerUser(username, password);
@@ -68,7 +95,18 @@ public class SocialMediaController {
     }
     
     private void getMessagesByAcctHandler(Context ctx){
-        String accountId = ctx.pathParam("acct-id");
+
+        /*
+         As a user, I should be able to submit a GET request on the endpoint 
+         GET localhost:8080/accounts/{account_id}/messages.
+
+       - The response body should contain a JSON representation of a list containing all messages posted by a 
+       - particular user, which is retrieved from the database. It is expected for the list to simply be empty 
+       - if there are no messages. The response status should always be 200, which is the default. */
+
+        String accountId = ctx.pathParam("acct_id");
+        String an = "sdfsd";
+    
     }
     
     private void patchMessageByIdHandler(Context ctx){
@@ -92,8 +130,5 @@ public class SocialMediaController {
 
     }
 
-    private void loginHandler(Context context){
         
-    }
-    
 }

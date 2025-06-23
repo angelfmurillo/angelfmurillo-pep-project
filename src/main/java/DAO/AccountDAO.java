@@ -27,7 +27,31 @@ public class AccountDAO {
         return usernameExists;
     }
 
+    public Account getAccount(String username, String password){
+
+        Account acct = null;
+
+        Connection connection = ConnectionUtil.getConnection();
+        try {
+            String sql = "select account_id from account where username = ? and password = ?;";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, username);
+            ps.setString(2, password);
+            ResultSet resultSet = ps.executeQuery();
+        
+            if(resultSet.next()){
+                int acctId = resultSet.getInt("account_id");
+                acct =  new Account(acctId, username, password);
+            }
+        }catch(SQLException e){ System.out.println(e.getMessage()); }
+        
+        return acct;
+    }
+
     public Account registerUser (String username, String password){
+
+        Account acct = null;
+        int affectedRows;
 
         Connection connection = ConnectionUtil.getConnection();
         try {
@@ -36,15 +60,18 @@ public class AccountDAO {
             
             ps.setString(1, username);
             ps.setString(2, password);
-            ps.executeUpdate();
-            ResultSet pkeyResultSet = ps.getGeneratedKeys();
-            if(pkeyResultSet.next()){
-                int generated_author_id = (int) pkeyResultSet.getLong(1);
-                return new Account(generated_author_id, username, password);
+            affectedRows = ps.executeUpdate();
+        
+            if (affectedRows > 0){
+              ResultSet pkeyResultSet = ps.getGeneratedKeys();
+              if(pkeyResultSet.next()){
+                 int generated_author_id = (int) pkeyResultSet.getLong(1);
+                 acct = new Account(generated_author_id, username, password);
+              }
             }
-        }catch(SQLException e){
-            System.out.println(e.getMessage());
-        }
-        return null;
+            
+        }catch(SQLException e){ System.out.println(e.getMessage());}
+
+        return acct;
     }
 }

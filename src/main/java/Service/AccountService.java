@@ -4,8 +4,17 @@ import DAO.AccountDAO;
 import Model.Account;
 
 public class AccountService {
-    
+    static private AccountDAO actDAO = new AccountDAO(); 
 
+    public Account loginUser(String username, String password){
+        
+        Account acctForLogin = null;
+        acctForLogin = actDAO.getAccount(username, password);   
+
+        return acctForLogin;
+        
+
+    }
     public boolean usernameExists(String username){
         
         AccountDAO actDAO = new AccountDAO();
@@ -14,16 +23,16 @@ public class AccountService {
 
     }
 
+
     //method to register a user
     public Account registerUser(String username, String password){
-        //Use a UserAcctDAO object to call methods that figure out if the user already exists
+        
         
         AccountDAO actDAO= new AccountDAO();
         Account act = null;
 
-        if (!actDAO.usernameExists(username)){ 
-            act = actDAO.registerUser(username, password);
-        }
+        act = actDAO.registerUser(username, password);
+        
 
         return act;
 
