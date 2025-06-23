@@ -43,7 +43,10 @@ public class AccountDAO {
                 int acctId = resultSet.getInt("account_id");
                 acct =  new Account(acctId, username, password);
             }
-        }catch(SQLException e){ System.out.println(e.getMessage()); }
+        }catch(SQLException e){ 
+            
+            
+            System.out.println(e.getMessage()); }
         
         return acct;
     }

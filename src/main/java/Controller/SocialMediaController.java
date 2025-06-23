@@ -2,8 +2,13 @@ package Controller;
 
 import io.javalin.Javalin;
 import io.javalin.http.Context;
+
+import static org.mockito.ArgumentMatchers.nullable;
+
 import Model.Account;
+import Model.Message;
 import Service.AccountService;
+import Service.MessageService;
 
 /**
  * TODO: You will need to write your own endpoints and handlers for your controller. The endpoints you will need can be
@@ -20,6 +25,7 @@ public class SocialMediaController {
         Javalin app = Javalin.create();
         app.post("/register", this::registerAccountHandler);
         app.post("/login", this::loginHandler);
+        
         app.post("/messages", this::postMessagesHandler);
         app.get("/messages", this::getMessagesHandler);
         app.get("/messages/{message_id}", this::getMessageByIdHandler);
@@ -56,12 +62,8 @@ public class SocialMediaController {
           200 OK, which is the default.
         - If the login is not successful, the response status should be 401. (Unauthorized)
        */
-
-
-
-
-
     }
+
     private void registerAccountHandler(Context ctx){
 
         Account userAcct = ctx.bodyAsClass(Account.class);
@@ -69,17 +71,18 @@ public class SocialMediaController {
         String password = userAcct.getPassword();
         AccountService acctService = new AccountService();
         Account addedAccount = new Account();
+        int passwordMaxLength = 4;
 
-        if (username.isBlank() || (password.length() < 4) ){
+        if (username.isBlank() || (password.length() < passwordMaxLength) ){
             ctx.status(400);
             return;
         }
 
         addedAccount = acctService.registerUser(username, password);
-        if (addedAccount != null) ctx.status(200).json(addedAccount);
-        else ctx.status(400);
-
-        
+        if (addedAccount != null) 
+           ctx.status(200).json(addedAccount);
+        else 
+           ctx.status(400);
 
         //call the service object to process the acct registration
         //return success if the acct is created, otherwise return failure
@@ -94,6 +97,43 @@ public class SocialMediaController {
 
     }
     
+    private void postMessagesHandler(Context context){
+
+        /*
+         * As a user, I should be able to submit a new post on the endpoint POST localhost:8080/messages. 
+         * The request body will contain a JSON representation of a message, which should be persisted to 
+         * the database, but will not contain a message_id.
+
+         - The creation of the message will be successful if and only if the message_text is not blank, 
+           is not over 255 characters, and posted_by refers to a real, existing user. If successful, the response 
+           body should contain a JSON of the message, including its message_id. The response status should be 200, 
+           which is the default. The new message should be persisted to the database.
+           If the creation of the message is not successful, the response status should be 400. (Client error)
+         * 
+         */
+
+        Message userMessage = context.bodyAsClass(Message.class);
+        String message = userMessage.getMessage_text();
+        int postedById = userMessage.getPosted_by();
+        long timePosted = userMessage.getTime_posted_epoch();
+        int messageMaxLength = 255;
+        Message addedMessage = new Message();
+        MessageService msgService = new MessageService();
+
+        if (message.isBlank() || (message.length() > messageMaxLength) ){
+            context.status(400);
+            return;
+        }
+
+        addedMessage = msgService.addMessage(message, postedById, timePosted);
+
+        if (addedMessage != null)
+           context.status(200).json(addedMessage);
+        else 
+           context.status(400);
+    }
+
+
     private void getMessagesByAcctHandler(Context ctx){
 
         /*
@@ -121,14 +161,7 @@ public class SocialMediaController {
         String messageId = ctx.pathParam("message-id");
     }
 
-
-    private void postMessagesHandler(Context context){
-    }
-
-    private void getMessagesHandler(Context context){
-
-
-    }
+    private void getMessagesHandler(Context context){}
 
         
 }
