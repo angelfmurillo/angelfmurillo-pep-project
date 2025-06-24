@@ -56,6 +56,26 @@ public class SocialMediaController {
 
         */
 
+        Message msg = context.bodyAsClass(Message.class);
+        String msgText = msg.getMessage_text();
+        int msgId = Integer.parseInt(context.pathParam("message_id"));
+        
+        MessageService msgService = new MessageService();
+        Message updatedMsg = new Message();
+        int msgMaxLength = 255;
+
+        if (msgText.isBlank() || (msgText.length() < msgMaxLength) ){
+            context.status(400);
+            return;
+        }
+
+        updatedMsg = msgService.updateMessage(msgId, msgText);
+        if (updatedMsg != null) 
+           context.status(200).json(updatedMsg);
+        else 
+           context.status(400);
+
+        
 
     }
     

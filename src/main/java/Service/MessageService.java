@@ -25,6 +25,19 @@ public class MessageService {
         return addedMsg;
     }
 
+    public Message updateMessage(int messageId, String messageText){
+        
+        
+        MessageDAO msgDAO= new MessageDAO();
+        Message updatedMsg = null;
+
+        updatedMsg = msgDAO.updateMessage(messageId, messageText);
+        
+        return updatedMsg;
+    }
+
+
+
     public Message getMessageById(int msgId){
         
         Message foundMsg; 
