@@ -1,9 +1,12 @@
 package DAO;
 
 
+import Model.Account;
 import Model.Message;
 import Util.ConnectionUtil;
 import java.sql.*;
+import java.util.List;
+import java.util.ArrayList;
 
 public class MessageDAO {
 
@@ -36,5 +39,55 @@ public class MessageDAO {
 
         return msg;
     }
-    
+
+    public Account getAccount(String username, String password){
+
+        Account acct = null;
+
+        Connection connection = ConnectionUtil.getConnection();
+        try {
+            String sql = "select account_id from account where username = ? and password = ?;";
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setString(1, username);
+            ps.setString(2, password);
+            ResultSet resultSet = ps.executeQuery();
+        
+            if(resultSet.next()){
+                int acctId = resultSet.getInt("account_id");
+                acct =  new Account(acctId, username, password);
+            }
+        }catch(SQLException e){ 
+           System.out.println(e.getMessage()); 
+        }
+        
+        return acct;
+    }
+
+    public List<Message> getAllMessages(){
+
+        List<Message> allMessages = new ArrayList<Message>();
+        int msgId, postedBy;
+        String message;
+        long timePosted;
+
+        Connection connection = ConnectionUtil.getConnection();
+        try {
+            String sql = "select * from message;";
+            Statement stmt = connection.createStatement();
+            ResultSet resultSet = stmt.executeQuery(sql);
+        
+            while (resultSet.next()){
+                msgId = resultSet.getInt("message_id");
+                postedBy = resultSet.getInt("posted_by");
+                message = resultSet.getString("message_text");
+                timePosted = resultSet.getLong("time_posted_epoch");
+                allMessages.add(new Message(msgId, postedBy, message, timePosted));
+            }
+
+        }catch(SQLException e){ 
+           System.out.println(e.getMessage()); 
+        }
+        
+        return allMessages;
+    }   
 }

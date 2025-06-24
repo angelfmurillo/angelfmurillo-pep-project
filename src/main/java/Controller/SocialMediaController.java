@@ -2,7 +2,7 @@ package Controller;
 
 import io.javalin.Javalin;
 import io.javalin.http.Context;
-
+import java.util.List;
 import static org.mockito.ArgumentMatchers.nullable;
 
 import Model.Account;
@@ -25,15 +25,30 @@ public class SocialMediaController {
         Javalin app = Javalin.create();
         app.post("/register", this::registerAccountHandler);
         app.post("/login", this::loginHandler);
-        
         app.post("/messages", this::postMessagesHandler);
+        
         app.get("/messages", this::getMessagesHandler);
+
         app.get("/messages/{message_id}", this::getMessageByIdHandler);
         app.delete("/messages/{message_id}", this::deleteMessageByIdHandler);
         app.patch("/messages/{message_id}", this::patchMessageByIdHandler);
         app.get("/account/{account_id}/messages", this::getMessagesByAcctHandler);
         
         return app;
+    }
+
+    private void getMessagesHandler(Context context){
+
+        /*
+         As a user, I should be able to submit a GET request on the endpoint GET localhost:8080/messages.
+        The response body should contain a JSON representation of a list containing all messages retrieved 
+        from the database. It is expected for the list to simply be empty if there are no messages. The response 
+        status should always be 200, which is the default.
+        */
+
+        MessageService msgService = new MessageService();
+        List<Message> allMsgs = msgService.getAllMessages(); 
+        context.status(200).json(allMsgs);
     }
 
     private void loginHandler(Context ctx){
@@ -161,7 +176,5 @@ public class SocialMediaController {
         String messageId = ctx.pathParam("message-id");
     }
 
-    private void getMessagesHandler(Context context){}
-
-        
+            
 }

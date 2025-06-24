@@ -1,6 +1,6 @@
 package Service;
 
-
+import java.util.List;
 import DAO.MessageDAO;
 import Model.Message;
 
@@ -23,6 +23,13 @@ public class MessageService {
         msg = msgDAO.addMessage(message, postedBy, timePosted);
         
         return msg;
+    }
+
+    public List<Message> getAllMessages(){
+
+        MessageDAO msgDAO= new MessageDAO();
+
+        return msgDAO.getAllMessages();
     }
 
 
