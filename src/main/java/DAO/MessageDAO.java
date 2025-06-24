@@ -40,27 +40,32 @@ public class MessageDAO {
         return msg;
     }
 
-    public Account getAccount(String username, String password){
+    public Message getMessageById(int msgId){
 
-        Account acct = null;
+        Message msg = null;
+        int postedBy;
+        String messageText;
+        Long timePosted;
 
         Connection connection = ConnectionUtil.getConnection();
         try {
-            String sql = "select account_id from account where username = ? and password = ?;";
+            String sql = "select * from message where message_id = ?;";
             PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setString(1, username);
-            ps.setString(2, password);
+            ps.setInt(1, msgId);
             ResultSet resultSet = ps.executeQuery();
         
             if(resultSet.next()){
-                int acctId = resultSet.getInt("account_id");
-                acct =  new Account(acctId, username, password);
+                postedBy = resultSet.getInt("posted_by");
+                messageText = resultSet.getString("message_text");
+                timePosted = resultSet.getLong("time_posted_epoch");
+                msg =  new Message(msgId, postedBy, messageText, timePosted);
             }
         }catch(SQLException e){ 
            System.out.println(e.getMessage()); 
         }
         
-        return acct;
+        return msg;
+        
     }
 
     public List<Message> getAllMessages(){

@@ -26,16 +26,38 @@ public class SocialMediaController {
         app.post("/register", this::registerAccountHandler);
         app.post("/login", this::loginHandler);
         app.post("/messages", this::postMessagesHandler);
-        
         app.get("/messages", this::getMessagesHandler);
 
         app.get("/messages/{message_id}", this::getMessageByIdHandler);
+        
         app.delete("/messages/{message_id}", this::deleteMessageByIdHandler);
         app.patch("/messages/{message_id}", this::patchMessageByIdHandler);
         app.get("/account/{account_id}/messages", this::getMessagesByAcctHandler);
         
         return app;
     }
+
+    private void getMessageByIdHandler(Context context){
+
+        /*
+        As a user, I should be able to submit a GET request on the endpoint GET localhost:8080/messages/{message_id}.
+        The response body should contain a JSON representation of the message identified by the message_id. 
+        It is expected for the response body to simply be empty if there is no such message. The response status 
+        should always be 200, which is the default.
+
+
+        */
+        MessageService msgService = new MessageService();
+        int msgId = Integer.parseInt(context.pathParam("message_id"));
+        Message foundMsg = msgService.getMessageById(msgId);
+        
+        if (foundMsg == null ) context.status(200);  
+        else context.status(200).json(foundMsg);
+        
+        
+    }
+
+
 
     private void getMessagesHandler(Context context){
 
@@ -171,10 +193,6 @@ public class SocialMediaController {
     private void deleteMessageByIdHandler(Context ctx){
         String messageId = ctx.pathParam("message-id");
     }
-    
-    private void getMessageByIdHandler(Context ctx){
-        String messageId = ctx.pathParam("message-id");
-    }
-
+       
             
 }

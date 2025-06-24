@@ -18,17 +18,26 @@ public class MessageService {
         
         
         MessageDAO msgDAO= new MessageDAO();
-        Message msg = null;
+        Message addedMsg = null;
 
-        msg = msgDAO.addMessage(message, postedBy, timePosted);
+        addedMsg = msgDAO.addMessage(message, postedBy, timePosted);
         
-        return msg;
+        return addedMsg;
     }
+
+    public Message getMessageById(int msgId){
+        
+        
+        MessageDAO msgDAO= new MessageDAO();
+        
+        return msgDAO.getMessageById(msgId);
+    }
+
 
     public List<Message> getAllMessages(){
 
         MessageDAO msgDAO= new MessageDAO();
-
+        
         return msgDAO.getAllMessages();
     }
 
