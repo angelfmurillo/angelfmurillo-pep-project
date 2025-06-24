@@ -27,18 +27,29 @@ public class MessageService {
 
     public Message getMessageById(int msgId){
         
+        Message foundMsg; 
+        MessageDAO msgDAO= new MessageDAO();
+
+        foundMsg = msgDAO.getMessageById(msgId); 
+        return foundMsg;
+    }
+
+    public Message deleteMessageById(int msgId){
         
+        Message deletedMessage;
         MessageDAO msgDAO= new MessageDAO();
         
-        return msgDAO.getMessageById(msgId);
+        deletedMessage = msgDAO.deleteMessageById(msgId);
+        return deletedMessage;
     }
 
 
     public List<Message> getAllMessages(){
 
         MessageDAO msgDAO= new MessageDAO();
+        List<Message> allMessages = msgDAO.getAllMessages();
         
-        return msgDAO.getAllMessages();
+        return allMessages;
     }
 
 

@@ -1,7 +1,6 @@
 package DAO;
 
 
-import Model.Account;
 import Model.Message;
 import Util.ConnectionUtil;
 import java.sql.*;
@@ -65,16 +64,39 @@ public class MessageDAO {
         }
         
         return msg;
-        
     }
+
+    public Message deleteMessageById(int msgId){
+
+        int affectedRows = 0;
+        Message msg = getMessageById(msgId);
+
+
+        if (!(msg == null)){
+            Connection connection = ConnectionUtil.getConnection();
+            try {
+              String sql = "delete from message where message_id = ?;";
+              PreparedStatement ps = connection.prepareStatement(sql);
+              ps.setInt(1, msgId);
+              affectedRows = ps.executeUpdate();
+            
+            }catch(SQLException e){ System.out.println(e.getMessage());}
+        
+            if (affectedRows == 1)
+              return msg;
+        }
+        
+        return msg;
+    }
+
 
     public List<Message> getAllMessages(){
 
-        List<Message> allMessages = new ArrayList<Message>();
         int msgId, postedBy;
         String message;
         long timePosted;
-
+        List<Message> allMessages = new ArrayList<Message>();
+        
         Connection connection = ConnectionUtil.getConnection();
         try {
             String sql = "select * from message;";
