@@ -41,33 +41,29 @@ public class MessageDAO {
 
     public Message updateMessage(int messageId, String messageText){
 
-        Message msg = null;
+        Connection connection = ConnectionUtil.getConnection();
+        Message msg = getMessageById(messageId);
         int affectedRows;
 
-        Connection connection = ConnectionUtil.getConnection();
+        if (!(msg == null)){
         
-        try {
-            String sql = "update message set message_text = ? where message_id = ?;";
-            PreparedStatement ps = connection.prepareStatement(sql);
+            try {
+              String sql = "update message set message_text = ? where message_id = ?;";
+              PreparedStatement ps = connection.prepareStatement(sql);
             
-            ps.setString(1, messageText);
-            ps.setInt(2, messageId);
+              ps.setString(1, messageText);
+              ps.setInt(2, messageId);
             
-            affectedRows = ps.executeUpdate();
+              affectedRows = ps.executeUpdate();
         
-            if (affectedRows > 0){
-              ResultSet resultSet = ps.getGeneratedKeys();
-              if(resultSet.next()){
-                 int msg_id = (int) resultSet.getLong(1);
-                 msg = new Message(messageId, postedBy, message, timePosted);
+              if (affectedRows == 1){
+                msg.setMessage_text(messageText);
               }
-            }
         
-        }catch(SQLException e){ System.out.println(e.getMessage());}
+            }catch(SQLException e){ System.out.println(e.getMessage());}
+        }
 
         return msg;
-
-
     }
 
 

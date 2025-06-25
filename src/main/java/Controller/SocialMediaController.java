@@ -64,7 +64,7 @@ public class SocialMediaController {
         Message updatedMsg = new Message();
         int msgMaxLength = 255;
 
-        if (msgText.isBlank() || (msgText.length() < msgMaxLength) ){
+        if (msgText.isBlank() || (msgText.length() >= msgMaxLength) ){
             context.status(400);
             return;
         }
@@ -74,9 +74,6 @@ public class SocialMediaController {
            context.status(200).json(updatedMsg);
         else 
            context.status(400);
-
-        
-
     }
     
     private void deleteMessageByIdHandler(Context context){
