@@ -129,7 +129,7 @@ public class MessageDAO {
             String sql = "select * from message where posted_by = ?;";
             PreparedStatement ps = connection.prepareStatement(sql);
             ps.setInt(1, accountId);
-            ResultSet resultSet = ps.executeQuery(sql);
+            ResultSet resultSet = ps.executeQuery();
         
             while (resultSet.next()){
                 msgId = resultSet.getInt("message_id");

@@ -23,6 +23,9 @@ public class SocialMediaController {
      */
     public Javalin startAPI() {
         Javalin app = Javalin.create();
+        
+        app.get("/accounts/{account_id}/messages", this::getMessagesByAcctHandler);
+        
         app.post("/register", this::registerAccountHandler);
         app.post("/login", this::loginHandler);
         app.post("/messages", this::postMessagesHandler);
@@ -30,9 +33,7 @@ public class SocialMediaController {
         app.get("/messages/{message_id}", this::getMessageByIdHandler);
         app.delete("/messages/{message_id}", this::deleteMessageByIdHandler);
         app.patch("/messages/{message_id}", this::patchMessageByIdHandler);
-        
-        app.get("/account/{account_id}/messages", this::getMessagesByAcctHandler);
-        
+               
         return app;
     }
 
@@ -51,8 +52,9 @@ public class SocialMediaController {
         MessageService msgService = new MessageService();
         int acctId = Integer.parseInt(context.pathParam("account_id"));
         
+
         List<Message> allMsgs = msgService.getMessagesByAccountId(acctId); 
-        context.status(200).json(allMsgs);
+        context.json(allMsgs);
     }
 
     private void patchMessageByIdHandler(Context context){

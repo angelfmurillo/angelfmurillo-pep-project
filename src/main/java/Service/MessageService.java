@@ -36,8 +36,6 @@ public class MessageService {
         return updatedMsg;
     }
 
-
-
     public Message getMessageById(int msgId){
         
         Message foundMsg; 
