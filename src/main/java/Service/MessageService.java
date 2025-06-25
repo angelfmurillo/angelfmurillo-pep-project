@@ -56,7 +56,14 @@ public class MessageService {
         return deletedMessage;
     }
 
+    public List<Message> getMessagesByAccountId(int accountId){
 
+        MessageDAO msgDAO= new MessageDAO();
+        List<Message> allMessages = msgDAO.getMessagesByAccountId(accountId);
+        
+        return allMessages;
+
+    } 
     public List<Message> getAllMessages(){
 
         MessageDAO msgDAO= new MessageDAO();

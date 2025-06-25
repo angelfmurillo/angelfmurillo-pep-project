@@ -29,12 +29,30 @@ public class SocialMediaController {
         app.get("/messages", this::getMessagesHandler);
         app.get("/messages/{message_id}", this::getMessageByIdHandler);
         app.delete("/messages/{message_id}", this::deleteMessageByIdHandler);
-        
         app.patch("/messages/{message_id}", this::patchMessageByIdHandler);
         
         app.get("/account/{account_id}/messages", this::getMessagesByAcctHandler);
         
         return app;
+    }
+
+    private void getMessagesByAcctHandler(Context context){
+
+        /**
+         * As a user, I should be able to submit a GET request on the endpoint 
+         * GET localhost:8080/accounts/{account_id}/messages.
+
+         The response body should contain a JSON representation of a list containing all messages posted by a 
+         particular user, which is retrieved from the database. It is expected for the list to simply be empty 
+         if there are no messages. The response status should always be 200, which is the default.
+
+         */
+
+        MessageService msgService = new MessageService();
+        int acctId = Integer.parseInt(context.pathParam("account_id"));
+        
+        List<Message> allMsgs = msgService.getMessagesByAccountId(acctId); 
+        context.status(200).json(allMsgs);
     }
 
     private void patchMessageByIdHandler(Context context){
@@ -114,8 +132,6 @@ public class SocialMediaController {
         if (foundMsg == null ) context.status(200);  
         else context.status(200).json(foundMsg);
     }
-
-
 
     private void getMessagesHandler(Context context){
 
@@ -227,21 +243,5 @@ public class SocialMediaController {
         else 
            context.status(400);
     }
-
-
-    private void getMessagesByAcctHandler(Context ctx){
-
-        /*
-         As a user, I should be able to submit a GET request on the endpoint 
-         GET localhost:8080/accounts/{account_id}/messages.
-
-       - The response body should contain a JSON representation of a list containing all messages posted by a 
-       - particular user, which is retrieved from the database. It is expected for the list to simply be empty 
-       - if there are no messages. The response status should always be 200, which is the default. */
-
-        String accountId = ctx.pathParam("acct_id");
-        String an = "sdfsd";
-    
-    }
-                
+                   
 }
