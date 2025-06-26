@@ -1,6 +1,5 @@
 package DAO;
 
-
 import Model.Message;
 import Util.ConnectionUtil;
 import java.sql.*;
@@ -12,19 +11,19 @@ public class MessageDAO {
     public Message addMessage(String message, int postedBy, long timePosted){
 
         Message msg = null;
-        int affectedRows;
-
-        Connection connection = ConnectionUtil.getConnection();
+        String sql = "insert into message (posted_by, message_text, time_posted_epoch) values (?,?,?);";
         
-        try {
-            String sql = "insert into message (posted_by, message_text, time_posted_epoch) values (?,?,?);";
+        try (
+            Connection connection = ConnectionUtil.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            )
+        {
             
             ps.setInt(1, postedBy);
             ps.setString(2, message);
             ps.setLong(3, timePosted);
 
-            affectedRows = ps.executeUpdate();
+            int affectedRows = ps.executeUpdate();
         
             if (affectedRows > 0){
               ResultSet pkeyResultSet = ps.getGeneratedKeys();
@@ -33,24 +32,25 @@ public class MessageDAO {
                  msg = new Message(generated_msg_id, postedBy, message, timePosted);
               }
             }
-        
-        }catch(SQLException e){ System.out.println(e.getMessage());}
+        }
+        catch(SQLException e){ System.out.println(e.getMessage());}
 
         return msg;
     }
 
     public Message updateMessage(int messageId, String messageText){
 
-        Connection connection = ConnectionUtil.getConnection();
         Message msg = getMessageById(messageId);
         int affectedRows;
-
+        String sql = "update message set message_text = ? where message_id = ?;";
+              
         if (!(msg == null)){
         
-            try {
-              String sql = "update message set message_text = ? where message_id = ?;";
-              PreparedStatement ps = connection.prepareStatement(sql);
-            
+            try(
+                Connection connection = ConnectionUtil.getConnection();
+                PreparedStatement ps = connection.prepareStatement(sql);
+            ) {   
+              
               ps.setString(1, messageText);
               ps.setInt(2, messageId);
             
@@ -66,30 +66,30 @@ public class MessageDAO {
         return msg;
     }
 
-
     public Message getMessageById(int msgId){
 
         Message msg = null;
-        int postedBy;
-        String messageText;
-        Long timePosted;
-
-        Connection connection = ConnectionUtil.getConnection();
-        try {
-            String sql = "select * from message where message_id = ?;";
+        String sql = "select * from message where message_id = ?;";
+            
+        try(
+            Connection connection = ConnectionUtil.getConnection();
             PreparedStatement ps = connection.prepareStatement(sql);
+           )
+        {
+            
             ps.setInt(1, msgId);
-            ResultSet resultSet = ps.executeQuery();
+            try (ResultSet resultSet = ps.executeQuery())
+            {
         
-            if(resultSet.next()){
-                postedBy = resultSet.getInt("posted_by");
-                messageText = resultSet.getString("message_text");
-                timePosted = resultSet.getLong("time_posted_epoch");
-                msg =  new Message(msgId, postedBy, messageText, timePosted);
+               if(resultSet.next()){
+                 int postedBy = resultSet.getInt("posted_by");
+                 String messageText = resultSet.getString("message_text");
+                 long timePosted = resultSet.getLong("time_posted_epoch");
+                 msg =  new Message(msgId, postedBy, messageText, timePosted);
+               }
             }
-        }catch(SQLException e){ 
-           System.out.println(e.getMessage()); 
-        }
+        
+        }catch(SQLException e){ System.out.println(e.getMessage()); }
         
         return msg;
     }
@@ -98,13 +98,15 @@ public class MessageDAO {
 
         int affectedRows = 0;
         Message msg = getMessageById(msgId);
-
+        String sql = "delete from message where message_id = ?;";
+              
 
         if (!(msg == null)){
-            Connection connection = ConnectionUtil.getConnection();
-            try {
-              String sql = "delete from message where message_id = ?;";
-              PreparedStatement ps = connection.prepareStatement(sql);
+            try (
+                Connection connection = ConnectionUtil.getConnection();
+                PreparedStatement ps = connection.prepareStatement(sql);
+                )
+            {
               ps.setInt(1, msgId);
               affectedRows = ps.executeUpdate();
             
@@ -119,23 +121,24 @@ public class MessageDAO {
 
     public List<Message> getMessagesByAccountId(int accountId){
 
-        int msgId;
-        String message;
-        long timePosted;
         List<Message> allMessages = new ArrayList<Message>();
-        
-        Connection connection = ConnectionUtil.getConnection();
-        try {
-            String sql = "select * from message where posted_by = ?;";
-            PreparedStatement ps = connection.prepareStatement(sql);
+        String sql = "select * from message where posted_by = ?;";
+            
+        try (
+             Connection connection = ConnectionUtil.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql);
+            )
+        {
             ps.setInt(1, accountId);
-            ResultSet resultSet = ps.executeQuery();
+            
+            try (ResultSet resultSet = ps.executeQuery()){;
         
-            while (resultSet.next()){
-                msgId = resultSet.getInt("message_id");
-                message = resultSet.getString("message_text");
-                timePosted = resultSet.getLong("time_posted_epoch");
-                allMessages.add(new Message(msgId, accountId, message, timePosted));
+              while (resultSet.next()){
+                  int msgId = resultSet.getInt("message_id");
+                  String message = resultSet.getString("message_text");
+                  long timePosted = resultSet.getLong("time_posted_epoch");
+                  allMessages.add(new Message(msgId, accountId, message, timePosted));
+              }
             }
 
         }catch(SQLException e){ 
@@ -145,31 +148,28 @@ public class MessageDAO {
         return allMessages;
     }   
 
-    
-
     public List<Message> getAllMessages(){
 
-        int msgId, postedBy;
-        String message;
-        long timePosted;
         List<Message> allMessages = new ArrayList<Message>();
-        
-        Connection connection = ConnectionUtil.getConnection();
-        try {
-            String sql = "select * from message;";
-            Statement stmt = connection.createStatement();
-            ResultSet resultSet = stmt.executeQuery(sql);
-        
-            while (resultSet.next()){
-                msgId = resultSet.getInt("message_id");
-                postedBy = resultSet.getInt("posted_by");
-                message = resultSet.getString("message_text");
-                timePosted = resultSet.getLong("time_posted_epoch");
+        String sql = "select * from message;";
+            
+        try
+           ( 
+             Connection connection = ConnectionUtil.getConnection();
+             Statement stmt = connection.createStatement();
+             ResultSet resultSet = stmt.executeQuery(sql);
+           ) 
+        {
+             while (resultSet.next()){
+                int msgId = resultSet.getInt("message_id");
+                int postedBy = resultSet.getInt("posted_by");
+                String message = resultSet.getString("message_text");
+                long timePosted = resultSet.getLong("time_posted_epoch");
                 allMessages.add(new Message(msgId, postedBy, message, timePosted));
             }
 
         }catch(SQLException e){ 
-           System.out.println(e.getMessage()); 
+            System.out.println(e.getMessage());
         }
         
         return allMessages;
