@@ -6,7 +6,13 @@ import Model.Message;
 
 public class MessageService {
     
-    private final MessageDAO msgDAO= new MessageDAO();
+    /**
+     * MessageService acts as the intermediary between the controller layer and the MessageDAO.
+     * It provides business logic for creating, retrieving, updating, and deleting messages,
+     * as well as retrieving messages by account ID or all messages in the system.
+     */
+    
+    private static final MessageDAO msgDAO= new MessageDAO();
         
     public Message addMessage(String message, int postedBy, long timePosted){
            
@@ -35,14 +41,12 @@ public class MessageService {
     public List<Message> getMessagesByAccountId(int accountId){
 
         List<Message> allMessagesByAcct = msgDAO.getMessagesByAccountId(accountId);
-        
         return allMessagesByAcct;
 
     } 
     public List<Message> getAllMessages(){
 
         List<Message> allMessages = msgDAO.getAllMessages();
-        
         return allMessages;
     }
 }

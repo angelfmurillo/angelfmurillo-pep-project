@@ -8,6 +8,12 @@ import java.util.ArrayList;
 
 public class MessageDAO {
 
+    /**
+     * MessageDAO provides data access methods for interacting with the 'message' table in the database.
+     * It supports creating, reading, updating, and deleting messages, as well as retrieving messages
+     * by account ID or fetching all messages.
+     */
+
     public Message addMessage(String message, int postedBy, long timePosted){
 
         Message msg = null;
@@ -141,9 +147,7 @@ public class MessageDAO {
               }
             }
 
-        }catch(SQLException e){ 
-           System.out.println(e.getMessage()); 
-        }
+        }catch(SQLException e){ System.out.println(e.getMessage());}
         
         return allMessages;
     }   
@@ -168,9 +172,7 @@ public class MessageDAO {
                 allMessages.add(new Message(msgId, postedBy, message, timePosted));
             }
 
-        }catch(SQLException e){ 
-            System.out.println(e.getMessage());
-        }
+        }catch(SQLException e){ System.out.println(e.getMessage());}
         
         return allMessages;
     }   

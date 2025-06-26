@@ -4,7 +4,13 @@ import DAO.AccountDAO;
 import Model.Account;
 
 public class AccountService {
-    static private AccountDAO actDAO = new AccountDAO(); 
+
+    /**
+      * AccountService provides business logic for user account operations such as registration and login.
+      * It delegates data access tasks to the AccountDAO and ensures account-related rules are enforced.
+      */
+
+    static private final AccountDAO actDAO = new AccountDAO(); 
 
     public Account loginUser(String username, String password){
         
@@ -12,27 +18,14 @@ public class AccountService {
         acctForLogin = actDAO.getAccount(username, password);   
 
         return acctForLogin;
-        
-
     }
-    public boolean usernameExists(String username){
-        
-        AccountDAO actDAO = new AccountDAO();
-
-        return actDAO.usernameExists(username);
-
-    }
-
-
+   
     //method to register a user
     public Account registerUser(String username, String password){
         
         
-        AccountDAO actDAO= new AccountDAO();
         Account act = null;
-
         act = actDAO.registerUser(username, password);
-        
 
         return act;
 

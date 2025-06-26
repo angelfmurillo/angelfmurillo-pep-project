@@ -6,23 +6,30 @@ import Model.Account;
 
 public class AccountDAO {
 
+    /**
+     * AccountDAO provides database access methods for managing user accounts.
+     * It supports registering new accounts, verifying login credentials, and checking
+     * for existing usernames.
+     */
+
     public boolean usernameExists(String username){
         
-        Connection connection = ConnectionUtil.getConnection();
         boolean usernameExists = false;
-
-        try{
-           String sql = "select count(*) from account where username = ?;";
-           PreparedStatement ps = connection.prepareStatement(sql);
-           ps.setString(1, username);
-           ResultSet rs = ps.executeQuery();
-           if (rs.next()){ 
-               int count = rs.getInt(1); 
-               if (count > 0) usernameExists = true;
-           }
-        }catch (SQLException e){
-            System.out.println(e.getMessage());
-        }
+        String sql = "select count(*) from account where username = ?;";
+        
+        try (
+             Connection connection = ConnectionUtil.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql);
+            )
+        {
+             ps.setString(1, username);
+             try (ResultSet rs = ps.executeQuery()){
+               if (rs.next()){ 
+                   int count = rs.getInt(1); 
+                   if (count > 0) usernameExists = true;
+               }
+             }
+        }catch (SQLException e){ System.out.println(e.getMessage());}
         
         return usernameExists;
     }
@@ -30,22 +37,23 @@ public class AccountDAO {
     public Account getAccount(String username, String password){
 
         Account acct = null;
-
-        Connection connection = ConnectionUtil.getConnection();
-        try {
-            String sql = "select account_id from account where username = ? and password = ?;";
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ps.setString(1, username);
-            ps.setString(2, password);
-            ResultSet resultSet = ps.executeQuery();
-        
-            if(resultSet.next()){
-                int acctId = resultSet.getInt("account_id");
-                acct =  new Account(acctId, username, password);
-            }
-        }catch(SQLException e){ 
-           System.out.println(e.getMessage()); 
-        }
+        String sql = "select account_id from account where username = ? and password = ?;";
+            
+        try (
+             Connection connection = ConnectionUtil.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql);
+            )
+        {
+             ps.setString(1, username);
+             ps.setString(2, password);
+            
+             try (ResultSet resultSet = ps.executeQuery()){
+                if(resultSet.next()){
+                    int acctId = resultSet.getInt("account_id");
+                    acct =  new Account(acctId, username, password);
+                } 
+             }
+        }catch(SQLException e){ System.out.println(e.getMessage());}
         
         return acct;
     }
@@ -54,12 +62,13 @@ public class AccountDAO {
 
         Account acct = null;
         int affectedRows;
-
-        Connection connection = ConnectionUtil.getConnection();
-        try {
-            String sql = "insert into account (username, password) values (?,?);";
-            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+        String sql = "insert into account (username, password) values (?,?);";
             
+        try (
+            Connection connection = ConnectionUtil.getConnection();
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            ) 
+        {
             ps.setString(1, username);
             ps.setString(2, password);
             affectedRows = ps.executeUpdate();
