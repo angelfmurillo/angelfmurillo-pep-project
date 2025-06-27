@@ -43,7 +43,8 @@ public class MessageService {
         List<Message> allMessagesByAcct = msgDAO.getMessagesByAccountId(accountId);
         return allMessagesByAcct;
 
-    } 
+    }
+     
     public List<Message> getAllMessages(){
 
         List<Message> allMessages = msgDAO.getAllMessages();

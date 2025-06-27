@@ -17,6 +17,11 @@ public class SocialMediaController {
     * 
     * @return a Javalin app object which defines the behavior of the Javalin controller.
     */
+
+    // The following two objects have no state, therefore have been declared as class contants 
+    // for performance reasons
+    private static final MessageService msgService = new MessageService();
+    private static final AccountService acctService = new AccountService();
     
     public Javalin startAPI() {
         
@@ -41,7 +46,6 @@ public class SocialMediaController {
      * Responds with a JSON list of messages for the given account_id.
     */
     
-        MessageService msgService = new MessageService();
         int acctId = Integer.parseInt(context.pathParam("account_id"));
         List<Message> allMsgs = msgService.getMessagesByAccountId(acctId); 
         context.json(allMsgs);
@@ -57,7 +61,6 @@ public class SocialMediaController {
 
         Message msg = context.bodyAsClass(Message.class);
         String msgText = msg.getMessage_text();
-        MessageService msgService = new MessageService();
         Message updatedMsg = new Message();
         int msgMaxLength = 255;
         int msgId = Integer.parseInt(context.pathParam("message_id"));
@@ -82,7 +85,6 @@ public class SocialMediaController {
          * Returns the deleted message in the response body if found; otherwise, returns an empty body.
          */
           
-        MessageService msgService = new MessageService();
         int msgId = Integer.parseInt(context.pathParam("message_id"));
         Message deletedMsg = msgService.deleteMessageById(msgId);
         
@@ -97,7 +99,6 @@ public class SocialMediaController {
         * Responds with the message in JSON format if found, or an empty body if not.
         */
 
-        MessageService msgService = new MessageService();
         int msgId = Integer.parseInt(context.pathParam("message_id"));
         Message foundMsg = msgService.getMessageById(msgId);
         
@@ -112,7 +113,6 @@ public class SocialMediaController {
          * Responds with a JSON list of all messages.
         */
 
-        MessageService msgService = new MessageService();
         List<Message> allMsgs = msgService.getAllMessages(); 
         context.status(200).json(allMsgs);
     }
@@ -131,8 +131,7 @@ public class SocialMediaController {
         long timePosted = userMessage.getTime_posted_epoch();
         int messageMaxLength = 255;
         Message addedMessage = new Message();
-        MessageService msgService = new MessageService();
-
+        
         if (message.isBlank() || (message.length() > messageMaxLength) ){
             context.status(400);
             return;
@@ -157,7 +156,6 @@ public class SocialMediaController {
         Account userAcct = ctx.bodyAsClass(Account.class);
         String username = userAcct.getUsername();
         String password = userAcct.getPassword();
-        AccountService acctService = new AccountService();
         Account acctLoggedIn = new Account();
 
         acctLoggedIn = acctService.loginUser(username, password);
@@ -176,7 +174,6 @@ public class SocialMediaController {
         Account userAcct = ctx.bodyAsClass(Account.class);
         String username = userAcct.getUsername();
         String password = userAcct.getPassword();
-        AccountService acctService = new AccountService();
         Account addedAccount = new Account();
         int passwordMaxLength = 4;
 
